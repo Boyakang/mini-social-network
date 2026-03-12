@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+venv/
+social.db
+.env
+static/uploads/avatars/
+static/uploads/posts/
