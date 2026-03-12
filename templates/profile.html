@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="profile-layout">
+    <div class="profile-main-card">
+        <form method="POST" enctype="multipart/form-data" class="profile-form">
+            <div class="avatar-upload-box">
+                <label for="avatar" class="avatar-clickable">
+                    {% if user and user['avatar'] %}
+                        <img src="{{ url_for('static', filename='uploads/avatars/' + user['avatar']) }}"
+                             class="profile-avatar-img" alt="avatar">
+                    {% else %}
+                        <div class="avatar large">{{ user['fullname'][0] if user else '' }}</div>
+                    {% endif %}
+                    <span class="avatar-plus">+</span>
+                </label>
+
+                <input
+                    type="file"
+                    id="avatar"
+                    name="avatar"
+                    accept="image/*"
+                    hidden
+                    onchange="updateAvatarFileName(this)"
+                >
+
+                <div id="avatar-file-name" class="file-name-text">Fayl tanlanmagan</div>
+            </div>
+
+            <h2>{{ user['fullname'] if user else '' }}</h2>
+            <p class="username">@{{ user['username'] if user else '' }}</p>
+            <p class="post-count">Postlar soni: {{ post_count }}</p>
+
+            <textarea name="bio" placeholder="Bio yozing...">{{ user['bio'] if user else '' }}</textarea>
+
+            <input
+                type="date"
+                name="birth_date"
+                value="{{ user['birth_date'] if user else '' }}"
+            >
+
+            <textarea name="info" placeholder="Qo‘shimcha ma’lumot yozing...">{{ user['info'] if user else '' }}</textarea>
+
+            <button type="submit">Profilni yangilash</button>
+        </form>
+    </div>
+
+    <div class="profile-posts-card">
+        <h3>Mening postlarim</h3>
+
+        {% for post in user_posts %}
+        <div class="post-card">
+            {% if post['content'] %}
+                <p class="post-content">{{ post['content'] }}</p>
+            {% endif %}
+
+            {% if post['image'] %}
+                <img src="{{ url_for('static', filename='uploads/posts/' + post['image']) }}"
+                     class="post-image" alt="post image">
+            {% endif %}
+
+            <div class="post-footer">
+                <span>{{ post['created_at'] }}</span>
+                <span>❤️ {{ post['like_count'] }}</span>
+                <a class="delete-btn" href="{{ url_for('delete_post', post_id=post['id']) }}">O‘chirish</a>
+            </div>
+        </div>
+        {% else %}
+        <div class="empty-box">Siz hali post joylamagansiz.</div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+function updateAvatarFileName(input) {
+    const fileName = input.files.length > 0 ? input.files[0].name : "Fayl tanlanmagan";
+    document.getElementById("avatar-file-name").textContent = fileName;
+}
+</script>
+{% endblock %}

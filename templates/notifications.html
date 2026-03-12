@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Bildirishnomalar</h2>
+
+<div class="notifications">
+
+{% for n in notifications %}
+
+<div class="notification-card">
+
+<b>@{{ n.username }}</b>
+
+{% if n.type == "like" %}
+sizning postingizni yoqtirdi ❤️
+{% endif %}
+
+{% if n.type == "comment" %}
+postingizga komment yozdi 💬
+{% endif %}
+
+{% if n.type == "follow" %}
+sizga obuna bo‘ldi 👤
+{% endif %}
+
+</div>
+
+{% else %}
+
+<p>Hozircha bildirishnomalar yo‘q</p>
+
+{% endfor %}
+
+</div>
+
+{% endblock %}

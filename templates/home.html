@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="home-layout">
+    <div class="left-panel">
+        <div class="profile-box">
+            <a href="{{ url_for('profile') }}" class="avatar-link">
+                {% if current_user and current_user['avatar'] %}
+                    <img src="{{ url_for('static', filename='uploads/avatars/' + current_user['avatar']) }}"
+                         class="profile-avatar-mini" alt="avatar">
+                {% else %}
+                    <div class="avatar">{{ session['fullname'][0] }}</div>
+                {% endif %}
+            </a>
+
+            <h3>{{ session['fullname'] }}</h3>
+            <p>@{{ session['username'] }}</p>
+        </div>
+
+        <div class="post-form-box">
+            <h3>Yangi post</h3>
+
+            <form method="POST" enctype="multipart/form-data">
+                <textarea name="content" placeholder="Nima o‘ylayapsiz?"></textarea>
+
+                <div class="file-upload-row">
+                    <label for="post_image" class="custom-file-label">Rasm tanlash</label>
+                    <span id="post-file-name" class="file-name-text">Fayl tanlanmagan</span>
+                    <input
+                        type="file"
+                        id="post_image"
+                        name="post_image"
+                        accept="image/*"
+                        hidden
+                        onchange="updatePostFileName(this)"
+                    >
+                </div>
+
+                <button type="submit">Post joylash</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="feed-panel">
+        <h2>Postlar lentasi</h2>
+
+        {% for post in posts %}
+        <div class="post-card">
+            <div class="post-header">
+                {% if post.avatar %}
+                    <img src="{{ url_for('static', filename='uploads/avatars/' + post.avatar) }}"
+                         class="avatar-img" alt="avatar">
+                {% else %}
+                    <div class="avatar small">{{ post.fullname[0] }}</div>
+                {% endif %}
+
+                <div>
+                    <strong>{{ post.fullname }}</strong><br>
+                    <span>@{{ post.username }}</span>
+                </div>
+            </div>
+
+            {% if post.content %}
+                <p class="post-content">{{ post.content }}</p>
+            {% endif %}
+
+            {% if post.image %}
+                <img src="{{ url_for('static', filename='uploads/posts/' + post.image) }}"
+                     class="post-image" alt="post image">
+            {% endif %}
+
+            <div class="post-actions">
+                <a href="{{ url_for('like_post', post_id=post.id) }}" class="like-btn">
+                    {% if post.liked %}❤️{% else %}🤍{% endif %} {{ post.like_count }}
+                </a>
+            </div>
+
+            <div class="comments-box">
+                {% for comment in post.comments %}
+                <div class="comment-item">
+                    <strong>{{ comment.fullname }}</strong>: {{ comment.content }}
+                </div>
+                {% endfor %}
+
+                <form method="POST"
+                      action="{{ url_for('comment_post', post_id=post.id) }}"
+                      class="comment-form">
+                    <input type="text" name="comment_content" placeholder="Komment yozing...">
+                    <button type="submit">Yuborish</button>
+                </form>
+            </div>
+
+            <div class="post-time">{{ post.created_at }}</div>
+        </div>
+        {% else %}
+        <div class="empty-box">Hozircha postlar yo‘q.</div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+function updatePostFileName(input) {
+    const fileName = input.files.length > 0 ? input.files[0].name : "Fayl tanlanmagan";
+    document.getElementById("post-file-name").textContent = fileName;
+}
+</script>
+{% endblock %}

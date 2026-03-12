@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="users-page">
+    <div class="users-header">
+        <h2>Foydalanuvchilar</h2>
+        <p class="users-subtitle">Tarmoqda mavjud foydalanuvchilar</p>
+
+        <form method="GET" action="{{ url_for('users') }}" class="search-form">
+            <input type="text" name="search" placeholder="Ism yoki username bo‘yicha qidirish..." value="{{ search }}">
+            <button type="submit">Qidirish</button>
+        </form>
+    </div>
+<h2>Mavjud foydalanuvchilar ro`yxati</h2>
+    <div class="users-grid">
+        {% for user in users_list %}
+        <div class="user-card">
+            {% if user['avatar'] %}
+                <img src="{{ url_for('static', filename='uploads/avatars/' + user['avatar']) }}"
+                     class="user-card-avatar" alt="avatar">
+            {% else %}
+                <div class="avatar large">{{ user['fullname'][0] }}</div>
+            {% endif %}
+
+            <h3>{{ user['fullname'] }}</h3>
+            <p>@{{ user['username'] }}</p>
+
+            <div class="follow-stats">
+                <span>Obunachilar: {{ user['followers_count'] }}</span>
+                <span>Obunalar: {{ user['following_count'] }}</span>
+            </div>
+
+            {% if user['bio'] %}
+                <div class="user-bio">{{ user['bio'] }}</div>
+            {% else %}
+                <div class="user-bio muted">Bio kiritilmagan</div>
+            {% endif %}
+	    <a href="{{ url_for('view_user', user_id=user['id']) }}" class="view-profile-btn">Profilni ko‘rish</a>
+            <a href="{{ url_for('follow_user', user_id=user['id']) }}"
+               class="follow-btn {% if user['is_following'] %}following{% endif %}">
+                {% if user['is_following'] %}
+                    Obunani bekor qilish
+                {% else %}
+                    Obuna bo‘lish
+                {% endif %}
+            </a>
+        </div>
+        {% else %}
+        <div class="empty-box">Foydalanuvchilar topilmadi.</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

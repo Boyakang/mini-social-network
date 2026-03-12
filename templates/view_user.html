@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="profile-layout">
+    <div class="profile-main-card">
+        <div class="avatar-upload-box">
+            {% if user['avatar'] %}
+                <img src="{{ url_for('static', filename='uploads/avatars/' + user['avatar']) }}"
+                     class="profile-avatar-img" alt="avatar">
+            {% else %}
+                <div class="avatar large">{{ user['fullname'][0] }}</div>
+            {% endif %}
+        </div>
+
+        <h2>{{ user['fullname'] }}</h2>
+        <p class="username">@{{ user['username'] }}</p>
+
+        <p class="post-count">Postlar soni: {{ user_posts|length }}</p>
+        <p class="post-count">Obunachilar: {{ followers_count }}</p>
+        <p class="post-count">Obunalar: {{ following_count }}</p>
+
+        {% if user['bio'] %}
+            <textarea readonly>{{ user['bio'] }}</textarea>
+        {% endif %}
+
+        {% if user['birth_date'] %}
+            <input type="text" value="{{ user['birth_date'] }}" readonly>
+        {% endif %}
+
+        {% if user['info'] %}
+            <textarea readonly>{{ user['info'] }}</textarea>
+        {% endif %}
+
+        {% if session['user_id'] != user['id'] %}
+        <a href="{{ url_for('chat', user_id=user['id']) }}" class="chat-btn">💬 Xabar yuborish</a>
+        <a href="{{ url_for('follow_user', user_id=user['id']) }}"
+           class="follow-btn {% if is_following %}following{% endif %}">
+            {% if is_following %}
+                Obunani bekor qilish
+            {% else %}
+                Obuna bo‘lish
+            {% endif %}
+        </a>
+        {% endif %}
+    </div>
+
+    <div class="profile-posts-card">
+        <h3>{{ user['fullname'] }} postlari</h3>
+
+        {% for post in user_posts %}
+        <div class="post-card">
+            {% if post['content'] %}
+                <p class="post-content">{{ post['content'] }}</p>
+            {% endif %}
+
+            {% if post['image'] %}
+                <img src="{{ url_for('static', filename='uploads/posts/' + post['image']) }}"
+                     class="post-image" alt="post image">
+            {% endif %}
+
+            <div class="post-footer">
+                <span>{{ post['created_at'] }}</span>
+                <span>❤️ {{ post['like_count'] }}</span>
+            </div>
+        </div>
+        {% else %}
+        <div class="empty-box">Bu foydalanuvchi hali post joylamagan.</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

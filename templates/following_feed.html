@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="home-layout">
+    <div class="left-panel">
+        <div class="profile-box">
+            <a href="{{ url_for('profile') }}" class="avatar-link">
+                {% if current_user and current_user['avatar'] %}
+                    <img src="{{ url_for('static', filename='uploads/avatars/' + current_user['avatar']) }}"
+                         class="profile-avatar-mini" alt="avatar">
+                {% else %}
+                    <div class="avatar">{{ session['fullname'][0] }}</div>
+                {% endif %}
+            </a>
+
+            <h3>{{ session['fullname'] }}</h3>
+            <p>@{{ session['username'] }}</p>
+        </div>
+
+        <div class="post-form-box">
+            <h3>Obunalar lentasi</h3>
+            <p class="users-subtitle">Bu yerda faqat siz obuna bo‘lgan foydalanuvchilarning postlari chiqadi.</p>
+        </div>
+    </div>
+
+    <div class="feed-panel">
+        <h2>Obunalar lentasi</h2>
+
+        {% for post in posts %}
+        <div class="post-card">
+            <div class="post-header">
+                {% if post.avatar %}
+                    <img src="{{ url_for('static', filename='uploads/avatars/' + post.avatar) }}"
+                         class="avatar-img" alt="avatar">
+                {% else %}
+                    <div class="avatar small">{{ post.fullname[0] }}</div>
+                {% endif %}
+
+                <div>
+                    <strong>{{ post.fullname }}</strong><br>
+                    <span>@{{ post.username }}</span>
+                </div>
+            </div>
+
+            {% if post.content %}
+                <p class="post-content">{{ post.content }}</p>
+            {% endif %}
+
+            {% if post.image %}
+                <img src="{{ url_for('static', filename='uploads/posts/' + post.image) }}"
+                     class="post-image" alt="post image">
+            {% endif %}
+
+            <div class="post-actions">
+                <a href="{{ url_for('like_post', post_id=post.id) }}" class="like-btn">
+                    {% if post.liked %}❤️{% else %}🤍{% endif %} {{ post.like_count }}
+                </a>
+            </div>
+
+            <div class="comments-box">
+                {% for comment in post.comments %}
+                <div class="comment-item">
+                    <strong>{{ comment.fullname }}</strong>: {{ comment.content }}
+                </div>
+                {% endfor %}
+
+                <form method="POST"
+                      action="{{ url_for('comment_post', post_id=post.id) }}"
+                      class="comment-form">
+                    <input type="text" name="comment_content" placeholder="Komment yozing...">
+                    <button type="submit">Yuborish</button>
+                </form>
+            </div>
+
+            <div class="post-time">{{ post.created_at }}</div>
+        </div>
+        {% else %}
+        <div class="empty-box">Siz hali hech kimga obuna bo‘lmagansiz yoki ular hali post joylamagan.</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
